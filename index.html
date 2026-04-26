@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AutoStore — Produk Digital</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<style>
+:root{
+--bg:#050507;--card:rgba(255,255,255,.035);--border:rgba(255,255,255,.06);
+--glass:rgba(255,255,255,.05);--glass2:rgba(255,255,255,.08);
+--accent:#6366f1;--accent2:#818cf8;--success:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+--txt:#f1f5f9;--txt2:rgba(241,245,249,.5);--txt3:rgba(241,245,249,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:0;height:0}
+
+/* iOS Glassmorphism */
+.glass{background:var(--glass);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid var(--border);border-radius:20px}
+.glass-s{background:var(--glass2);backdrop-filter:blur(60px) saturate(200%);-webkit-backdrop-filter:blur(60px) saturate(200%);border:1px solid rgba(255,255,255,.1);border-radius:24px}
+.glass-header{background:rgba(5,5,7,.72);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-bottom:1px solid var(--border)}
+
+/* Mesh Gradient Background */
+.bg-mesh{
+background:var(--bg);
+background-image:
+radial-gradient(at 0% 0%,rgba(99,102,241,.12) 0%,transparent 50%),
+radial-gradient(at 100% 0%,rgba(236,72,153,.08) 0%,transparent 50%),
+radial-gradient(at 50% 100%,rgba(34,197,94,.06) 0%,transparent 50%);
+}
+
+/* Floating Orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.orb-1{width:300px;height:300px;background:rgba(99,102,241,.1);top:-50px;left:-50px;animation:orbFloat 20s ease-in-out infinite}
+.orb-2{width:250px;height:250px;background:rgba(236,72,153,.08);bottom:-30px;right:-30px;animation:orbFloat 25s ease-in-out infinite reverse}
+.orb-3{width:200px;height:200px;background:rgba(34,197,94,.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbFloat 18s ease-in-out infinite}
+@keyframes orbFloat{0%,100%{transform:translate(0,0)}25%{transform:translate(30px,-30px)}50%{transform:translate(-20px,20px)}75%{transform:translate(20px,10px)}}
+
+/* Product Cards */
+.p-card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:22px;
+padding:22px;
+cursor:pointer;
+position:relative;
+overflow:hidden;
+transition:all .4s cubic-bezier(.22,1,.36,1);
+}
+.p-card::before{
+content:'';position:absolute;inset:0;
+background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 50%);
+border-radius:22px;transition:opacity .4s;opacity:0;
+}
+.p-card:hover{
+transform:translateY(-4px);
+border-color:rgba(99,102,241,.25);
+box-shadow:0 20px 60px -15px rgba(99,102,241,.15),0 0 0 1px rgba(99,102,241,.1);
+}
+.p-card:hover::before{opacity:1}
+.p-card:active{transform:translateY(-2px) scale(.98)}
+.p-card.sel{
+border-color:rgba(99,102,241,.4);
+background:rgba(99,102,241,.06);
+box-shadow:0 0 40px rgba(99,102,241,.12);
+}
+.p-card.sel::before{opacity:1}
+
+/* Icon Circle */
+.icon-circle{
+width:48px;height:48px;border-radius:16px;
+display:flex;align-items:center;justify-content:center;
+font-size:20px;flex-shrink:0;
+transition:all .4s cubic-bezier(.22,1,.36,1);
+}
+.p-card:hover .icon-circle{transform:scale(1.08) rotate(-3deg)}
+
+/* Popular Badge */
+.badge-hot{
+position:absolute;top:14px;right:14px;
+background:linear-gradient(135deg,#ec4899,#f43f5e);
+color:#fff;font-size:10px;font-weight:700;
+padding:4px 10px;border-radius:100px;
+letter-spacing:.3px;
+box-shadow:0 4px 15px rgba(236,72,153,.3);
+}
+
+/* Category Pills */
+.pill{
+padding:9px 18px;border-radius:100px;font-size:12.5px;font-weight:600;
+cursor:pointer;white-space:nowrap;
+background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+color:var(--txt3);transition:all .35s cubic-bezier(.22,1,.36,1);
+}
+.pill:hover{color:var(--txt2);border-color:rgba(255,255,255,.12)}
+.pill.on{
+background:linear-gradient(135deg,var(--accent),#8b5cf6);
+color:#fff;border-color:transparent;
+box-shadow:0 4px 20px rgba(99,102,241,.25);
+}
+
+/* Inputs */
+.field{
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.08);
+border-radius:16px;padding:15px 18px;
+color:#fff;font-size:15px;width:100%;
+outline:none;transition:all .35s cubic-bezier(.22,1,.36,1);
+}
+.field:focus{
+border-color:var(--accent);
+box-shadow:0 0 0 4px rgba(99,102,241,.1),0 0 20px rgba(99,102,241,.08);
+}
+.field::placeholder{color:var(--txt3)}
+
+/* Primary Button */
+.btn-p{
+background:linear-gradient(135deg,#6366f1,#8b5cf6);
+color:#fff;font-weight:700;border:none;border-radius:16px;
+padding:16px;width:100%;font-size:15px;cursor:pointer;
+position:relative;overflow:hidden;
+transition:all .35s cubic-bezier(.22,1,.36,1);
+box-shadow:0 4px 25px rgba(99,102,241,.25);
+}
+.btn-p:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 40px rgba(99,102,241,.35);
+}
+.btn-p:active{transform:scale(.97)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-p .shim{
+position:absolute;top:0;left:-100%;width:100%;height:100%;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+animation:shim 2.5s infinite;
+}
+@keyframes shim{to{left:100%}}
+
+.btn-s{
+background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+color:var(--txt2);font-weight:600;border-radius:14px;
+padding:12px 20px;font-size:13px;cursor:pointer;
+transition:all .3s cubic-bezier(.22,1,.36,1);
+}
+.btn-s:hover{background:rgba(255,255,255,.08);color:#fff}
+.btn-s:active{transform:scale(.96)}
+
+/* Modal */
+.modal-bg{
+position:fixed;inset:0;z-index:1000;
+background:rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+display:none;align-items:flex-end;justify-content:center;padding:0;
+}
+.modal-bg.show{display:flex}
+@media(min-width:480px){.modal-bg{align-items:center;padding:20px}}
+
+.modal-box{
+background:#111116;
+border:1px solid rgba(255,255,255,.06);
+border-radius:28px 28px 0 0;
+width:100%;max-width:440px;
+max-height:95vh;overflow-y:auto;
+animation:sheetUp .45s cubic-bezier(.22,1,.36,1);
+}
+@media(min-width:480px){.modal-box{border-radius:28px}}
+@keyframes sheetUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:480px){
+@keyframes sheetUp{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+}
+
+/* Handle Bar (iOS style) */
+.handle{width:36px;height:4px;border-radius:9px;background:rgba(255,255,255,.15);margin:10px auto 0}
+
+/* QR Box */
+.qr-wrap{background:#fff;border-radius:20px;padding:20px;text-align:center}
+.qr-wrap img{max-width:220px;width:100%;margin:0 auto;display:block;border-radius:8px}
+
+/* Status */
+.st-pend{background:rgba(245,158,11,.1);color:#fbbf24}
+.st-ok{background:rgba(34,197,94,.1);color:#22c55e}
+.st-dlv{background:rgba(99,102,241,.1);color:#818cf8}
+.st-err{background:rgba(239,68,68,.1);color:#ef4444}
+.st-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-size:11px;font-weight:700}
+
+/* Step Dots */
+.dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;transition:all .4s}
+.dot.on{background:var(--accent);color:#fff;box-shadow:0 0 15px rgba(99,102,241,.3)}
+.dot.ok{background:var(--success);color:#fff;box-shadow:0 0 15px rgba(34,197,94,.3)}
+.dot.off{background:rgba(255,255,255,.06);color:var(--txt3)}
+.step-line{width:28px;height:2px;background:rgba(255,255,255,.06);border-radius:9px;transition:background .5s}
+.step-line.ok{background:var(--success)}
+.step-line.on{background:var(--accent)}
+
+/* Pulse */
+.pulse-ring{width:10px;height:10px;border-radius:50%;position:relative}
+.pulse-ring::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid currentColor;animation:pring 1.8s ease-out infinite;opacity:0}
+@keyframes pring{0%{transform:scale(.8);opacity:.8}100%{transform:scale(2);opacity:0}}
+
+/* Spinner */
+.spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:sp .65s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{
+position:fixed;top:env(safe-area-inset-top,12px);left:50%;
+transform:translateX(-50%) translateY(calc(-100% - 20px));
+padding:14px 24px;border-radius:16px;
+font-size:13px;font-weight:600;z-index:9999;
+max-width:92%;text-align:center;
+backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+transition:transform .5s cubic-bezier(.22,1,.36,1);
+box-shadow:0 10px 40px rgba(0,0,0,.3);
+}
+.toast.show{transform:translateX(-50%) translateY(12px)}
+.toast.success{background:rgba(34,197,94,.9);color:#fff}
+.toast.error{background:rgba(239,68,68,.9);color:#fff}
+.toast.info{background:rgba(99,102,241,.9);color:#fff}
+
+/* Confetti */
+.cnf{position:fixed;top:-12px;z-index:9998;pointer-events:none;animation:cnfFall linear forwards}
+@keyframes cnfFall{to{top:105vh;transform:rotate(720deg)}}
+
+/* Animations */
+.fade-up{animation:fup .6s cubic-bezier(.22,1,.36,1) both}
+@keyframes fup{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}
+
+.scale-in{animation:scIn .5s cubic-bezier(.22,1,.36,1) both}
+@keyframes scIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
+/* Responsive Grid */
+@media(max-width:639px){.pgrid{grid-template-columns:1fr!important}}
+</style>
+</head>
+<body class="bg-mesh">
+
+<!-- Background Orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="glass-header sticky top-0 z-50">
+<div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <i class="fa-solid fa-bag-shopping text-white text-sm"></i>
+        </div>
+        <div>
+            <h1 class="text-[15px] font-extrabold text-white tracking-tight">AutoStore</h1>
+            <p class="text-[9px] text-indigo-400 font-semibold tracking-widest uppercase">Digital Products</p>
+        </div>
+    </div>
+    <button onclick="showHist()" class="btn-s text-xs px-3 py-2">
+        <i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Riwayat
+    </button>
+</div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="max-w-5xl mx-auto px-4 pt-6 pb-2 relative z-10 fade-up">
+<div class="glass-s p-6 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
+    <div class="relative z-10">
+        <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-3 py-1.5 mb-3">
+            <i class="fa-solid fa-bolt text-indigo-400 text-[10px]"></i>
+            <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Instant Delivery</span>
+        </div>
+        <h2 class="text-[22px] font-extrabold text-white leading-snug mb-2">
+            Produk Digital<br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Otomatis & Instan</span>
+        </h2>
+        <p class="text-[13px] text-white/35 leading-relaxed max-w-sm">Bayar via QRIS, produk langsung dikirim otomatis ke email kamu dalam hitungan detik.</p>
+        <div class="flex gap-4 mt-4">
+            <span class="text-[11px] text-emerald-400 font-medium"><i class="fa-solid fa-shield-check mr-1"></i>Aman</span>
+            <span class="text-[11px] text-blue-400 font-medium"><i class="fa-solid fa-bolt mr-1"></i>Instan</span>
+            <span class="text-[11px] text-amber-400 font-medium"><i class="fa-solid fa-clock mr-1"></i>24/7</span>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ============ SEARCH + FILTER ============ -->
+<section class="max-w-5xl mx-auto px-4 py-4 relative z-10 fade-up d1">
+<div class="relative mb-3">
+    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-sm"></i>
+    <input type="text" id="searchBox" class="field pl-11 text-[13px]" placeholder="Cari produk..." oninput="doFilter()">
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1" style="scrollbar-width:none">
+    <div class="pill on" onclick="pickCat('all',this)">Semua</div>
+    <div class="pill" onclick="pickCat('membership',this)"><i class="fa-solid fa-crown mr-1 text-[10px]"></i>Member</div>
+    <div class="pill" onclick="pickCat('topup',this)"><i class="fa-solid fa-coins mr-1 text-[10px]"></i>Top Up</div>
+    <div class="pill" onclick="pickCat('digital',this)"><i class="fa-solid fa-code mr-1 text-[10px]"></i>Digital</div>
+    <div class="pill" onclick="pickCat('voucher',this)"><i class="fa-solid fa-ticket mr-1 text-[10px]"></i>Voucher</div>
+    <div class="pill" onclick="pickCat('pulsa',this)"><i class="fa-solid fa-signal mr-1 text-[10px]"></i>Pulsa</div>
+</div>
+</section>
+
+<!-- ============ PRODUCTS ============ -->
+<section class="max-w-5xl mx-auto px-4 py-1 relative z-10 fade-up d2">
+<div class="flex items-center justify-between mb-3">
+    <h3 class="text-sm font-bold text-white">Katalog Produk</h3>
+    <span id="pCount" class="text-[11px] text-white/25 font-medium">0 produk</span>
+</div>
+<div id="pGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pgrid"></div>
+<div id="pEmpty" class="text-center py-20" style="display:none">
+    <i class="fa-solid fa-box-open text-4xl text-white/10 mb-3"></i>
+    <p class="text-white/25 text-sm font-medium">Produk tidak ditemukan</p>
+</div>
+</section>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div id="orderModal" class="modal-bg" onclick="outClick(event,'orderModal')">
+<div class="modal-box">
+<div class="handle"></div>
+
+<div class="p-5 pb-0">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-[15px] font-bold text-white">Checkout</h3>
+        <button onclick="closeM('orderModal')" class="w-8 h-8 rounded-full flex items-center justify-center text-white/30 hover:text-white hover:bg-white/5 transition-all"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="flex items-center justify-center gap-2 mb-5">
+        <div id="d1" class="dot on">1</div>
+        <div id="l1" class="step-line"></div>
+        <div id="d2" class="dot off">2</div>
+        <div id="l2" class="step-line"></div>
+        <div id="d3" class="dot off">3</div>
+    </div>
+</div>
+
+<!-- Step 1: Detail -->
+<div id="st1" class="p-5 pt-0">
+    <div class="glass rounded-2xl p-4 mb-4">
+        <div class="flex items-center gap-3.5">
+            <div id="selIcWrap" class="icon-circle" style="background:rgba(99,102,241,.15)">
+                <i id="selIc" class="fa-solid fa-crown" style="color:#6366f1"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 id="selNm" class="font-bold text-white text-[13px]">-</h4>
+                <p id="selDs" class="text-[11px] text-white/30 mt-0.5 truncate">-</p>
+                <p id="selPr" class="text-indigo-400 font-bold text-[13px] mt-1">Rp 0</p>
+            </div>
+        </div>
+    </div>
+    <div class="mb-4">
+        <label class="text-[11px] font-semibold text-white/30 mb-2 block">Jumlah</label>
+        <div class="flex items-center gap-3">
+            <button onclick="cQty(-1)" class="w-11 h-11 rounded-2xl glass flex items-center justify-center text-white/60 hover:text-white hover:bg-white/8 transition-all active:scale-90"><i class="fa-solid fa-minus text-xs"></i></button>
+            <input type="number" id="oQty" value="1" min="1" max="99" class="field text-center w-20 text-lg font-bold" oninput="uTotal()">
+            <button onclick="cQty(1)" class="w-11 h-11 rounded-2xl glass flex items-center justify-center text-white/60 hover:text-white hover:bg-white/8 transition-all active:scale-90"><i class="fa-solid fa-plus text-xs"></i></button>
+        </div>
+    </div>
+    <div class="space-y-3 mb-4">
+        <div>
+            <label class="text-[11px] font-semibold text-white/30 mb-1.5 block"><i class="fa-solid fa-user mr-1"></i>Nama</label>
+            <input type="text" id="bNm" class="field text-[13px]" placeholder="Nama (opsional)">
+        </div>
+        <div>
+            <label class="text-[11px] font-semibold text-white/30 mb-1.5 block"><i class="fa-solid fa-envelope mr-1"></i>Email <span class="text-red-400">*</span></label>
+            <input type="email" id="bEm" class="field text-[13px]" placeholder="email@contoh.com">
+        </div>
+    </div>
+    <div class="glass rounded-2xl p-4 mb-5">
+        <div class="flex justify-between mb-2"><span class="text-[12px] text-white/30">Harga satuan</span><span id="subTx" class="text-[12px] font-semibold text-white">Rp 0</span></div>
+        <div class="flex justify-between mb-2"><span class="text-[12px] text-white/30">Jumlah</span><span id="qTx" class="text-[12px] font-semibold text-white">1</span></div>
+        <div class="border-t border-white/5 my-2.5"></div>
+        <div class="flex justify-between"><span class="text-[13px] font-bold text-white">Total</span><span id="tTx" class="text-[17px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Rp 0</span></div>
+    </div>
+    <button onclick="doOrder()" id="goBtn" class="btn-p"><span class="shim"></span><span id="goTx"><i class="fa-solid fa-qrcode mr-2"></i>Bayar dengan QRIS</span></button>
+</div>
+
+<!-- Step 2: Payment -->
+<div id="st2" class="p-5 pt-0" style="display:none">
+    <div class="text-center mb-4">
+        <div class="inline-flex items-center gap-2.5 st-pend st-pill">
+            <div class="pulse-ring" style="color:#fbbf24"><div class="w-2.5 h-2.5 rounded-full bg-current"></div></div>
+            Menunggu Pembayaran
+        </div>
+    </div>
+    <div class="glass rounded-2xl p-4 mb-4">
+        <div class="flex items-center gap-3 mb-3">
+            <div id="payIcW" class="icon-circle" style="background:rgba(99,102,241,.15)"><i id="payIc" class="fa-solid fa-crown" style="color:#6366f1"></i></div>
+            <div class="flex-1"><p id="payNm" class="font-bold text-white text-[13px]">-</p><p id="payOid" class="text-[10px] text-white/20 font-mono mt-0.5">-</p></div>
+        </div>
+        <div class="flex justify-between items-center pt-3 border-t border-white/5">
+            <span class="text-[12px] text-white/30">Total Bayar</span>
+            <span id="payAmt" class="text-[18px] font-extrabold text-emerald-400">Rp 0</span>
+        </div>
+    </div>
+    <div class="qr-wrap mb-4">
+        <p class="text-gray-500 font-bold text-[12px] mb-3">Scan QRIS untuk membayar</p>
+        <img id="qrImg" src="" alt="QRIS Code">
+        <p class="text-gray-400 text-[10px] mt-3">Gunakan e-wallet atau mobile banking</p>
+    </div>
+    <div class="text-center mb-4">
+        <p class="text-[10px] text-white/25 mb-1">Waktu tersisa</p>
+        <div id="cdTm" class="text-[26px] font-extrabold text-amber-400 font-mono tracking-wider">15:00</div>
+    </div>
+    <div class="glass rounded-2xl p-3.5 text-center mb-4">
+        <div class="flex items-center justify-center gap-2.5">
+            <div class="spin" style="width:14px;height:14px;border-width:2px"></div>
+            <span class="text-[11px] text-white/30">Mendeteksi pembayaran otomatis...</span>
+        </div>
+    </div>
+    <button onclick="doCancel()" class="btn-s w-full text-center text-[12px]"><i class="fa-solid fa-xmark mr-1.5"></i>Batalkan Pesanan</button>
+</div>
+
+<!-- Step 3: Success -->
+<div id="st3" class="p-5 pt-0" style="display:none">
+    <div class="text-center py-2">
+        <div class="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4 scale-in">
+            <i class="fa-solid fa-circle-check text-[40px] text-emerald-400"></i>
+        </div>
+        <h3 class="text-[20px] font-extrabold text-white mb-1">Berhasil! 🎉</h3>
+        <p class="text-[12px] text-white/35 mb-5">Produk dikirim otomatis ke email kamu</p>
+        <div class="glass rounded-2xl p-4 text-left space-y-3 mb-4">
+            <div class="flex justify-between"><span class="text-[11px] text-white/25">Order ID</span><span id="okOid" class="text-[11px] font-mono text-white/50">-</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-white/25">Produk</span><span id="okProd" class="text-[11px] font-semibold text-white">-</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-white/25">Dibayar</span><span id="okAmt" class="text-[11px] font-bold text-emerald-400">-</span></div>
+            <div class="flex justify-between items-center"><span class="text-[11px] text-white/25">Status</span><span class="st-pill st-dlv text-[9px]"><i class="fa-solid fa-check"></i>Delivered</span></div>
+            <div class="border-t border-white/5 pt-3">
+                <span class="text-[10px] text-white/25 block mb-1.5">Kode Lisensi</span>
+                <div class="flex items-center gap-2">
+                    <code id="okCode" class="text-[12px] font-mono text-indigo-400 font-bold bg-indigo-500/8 border border-indigo-500/15 px-3 py-2 rounded-xl flex-1 break-all">-</code>
+                    <button onclick="doCopy()" class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-400 hover:bg-indigo-500/20 transition-all active:scale-90"><i class="fa-solid fa-copy text-sm"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="glass rounded-2xl p-3 mb-5">
+            <div class="flex items-center gap-2 text-[11px] text-emerald-400"><i class="fa-solid fa-envelope"></i><span>Detail terkirim ke email kamu</span></div>
+        </div>
+        <button onclick="closeM('orderModal');doReset()" class="btn-p"><i class="fa-solid fa-bag-shopping mr-2"></i>Belanja Lagi</button>
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- ============ HISTORY MODAL ============ -->
+<div id="histModal" class="modal-bg" onclick="outClick(event,'histModal')">
+<div class="modal-box">
+<div class="handle"></div>
+<div class="p-5">
+    <div class="flex items-center justify-between mb-5">
+        <h3 class="text-[15px] font-bold text-white"><i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-400"></i>Riwayat Order</h3>
+        <button onclick="closeM('histModal')" class="w-8 h-8 rounded-full flex items-center justify-center text-white/30 hover:text-white hover:bg-white/5 transition-all"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="histList" class="space-y-3">
+        <div class="text-center py-10"><i class="fa-solid fa-inbox text-3xl text-white/8 mb-3"></i><p class="text-white/25 text-[12px]">Belum ada riwayat</p></div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="max-w-5xl mx-auto px-4 py-10 mt-4 relative z-10">
+<div class="glass rounded-2xl p-5 text-center">
+    <div class="flex items-center justify-center gap-2 mb-2">
+        <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"><i class="fa-solid fa-bag-shopping text-white text-[8px]"></i></div>
+        <span class="font-bold text-white text-[13px]">AutoStore</span>
+    </div>
+    <p class="text-[9px] text-white/15 mb-1.5">Powered by Pakasir Payment Gateway</p>
+    <div class="flex items-center justify-center gap-3 text-white/10 text-[9px]">
+        <span>QRIS ✓</span><span>•</span><span>Auto Delivery ✓</span><span>•</span><span>Secure ✓</span>
+    </div>
+</div>
+</footer>
+<div style="height:20px"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
